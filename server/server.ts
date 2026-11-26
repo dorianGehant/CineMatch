@@ -2,6 +2,53 @@ import express from 'express';
 import type { Request, Response } from 'express';
 import db from './base.ts';
 
+
+////////////// ///////////////////////////////////////
+// Partie fonctions pour utilisation dans route API //
+//////////////////////////////////////////////////////
+
+// Vérifie si une date est dans un format valide pour une soiree (pas dans le passé)
+function validateSoireeDate(date: string): string {
+
+    // Du format aaaa-mm-jj
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        return "Format de la date incorrect : doit être aaaa-mm-jj";
+    }
+
+    const [year, month, day] = date.split("-").map(Number);
+
+    // Quand on fait Date() si la date est incorrecte par ex 2026-02-30, 
+    // alors ça corrige en 2026-03-02
+    // on fait month - 1 car constructeur Date() part de index 0 pour mois (alors que nous de 1)
+    const correctDate = new Date(Date.UTC(year, month - 1, day)); 
+
+    // Si la date corrigée est pas la même que celle de base cela veut dire que on avait une date incorrecte
+    if (correctDate.getUTCFullYear() !== year ||
+        correctDate.getUTCMonth() !== month - 1 ||
+        correctDate.getUTCDate() !== day)
+    {
+        return "La date de la soirée n'est pas une date possible";
+    }
+
+    // Constructeur date sans paramètres = date actuelle
+    const currentDate = new Date();
+    // On ignore le temps car on veut seulement comparer date
+    currentDate.setHours(0, 0, 0, 0);
+
+    if(new Date(year, month - 1, day) < currentDate){
+        return "La date de la soirée ne peut pas être dans le passé";
+    }
+
+    // Pas de problème, date est correcte
+    return "";
+}
+
+
+
+////////////////
+// Partie API //
+////////////////
+
 const app = express();
 app.use(express.json());
 
@@ -117,6 +164,163 @@ app.get("/api/rechercheFilm", async (req: Request, res: Response) => {
         });
     }
 });
+
+
+// POST /api/soirees
+// Créer une soirée (et ses membres si ils n'existent pas déjà)
+
+app.post("/api/soirees", async (req: Request, res: Response) => {
+    const { nom, date, membres } = req.body;
+
+    // Vérification du nom
+    if (typeof nom !== "string" || nom.trim() === "") {
+        return res.status(400).json({
+            message: "Le nom de la soirée est obligatoire."
+        });
+    }
+
+    // Vérification type de la date
+    if (typeof date !== "string") {
+        return res.status(400).json({
+            message: "La date doit être une chaîne de caractère"
+        });
+    }
+
+    // Vérification que la date est bien une date correcte
+    const dateVerifMessage = validateSoireeDate(date);
+    if(dateVerifMessage != ""){
+        return res.status(400).json({
+            message: dateVerifMessage
+        });
+    }
+
+    // Vérification du nombre de membres
+    if (!Array.isArray(membres) || membres.length < 2 || membres.length > 4) {
+        return res.status(400).json({
+            message: "Une soirée doit avoir entre 2 et 4 membres."
+        });
+    }
+
+    // Vérification des prénoms
+    if (membres.some(
+        (prenom: unknown) =>
+            typeof prenom !== "string" || prenom.trim() === ""
+    )) {
+        return res.status(400).json({
+            message: "Tous les prénoms doivent être renseignés."
+        });
+    }
+
+    // Vérification des doublons (sans tenir compte de la casse)
+    const prenomsNormalises = membres.map(
+        (prenom: string) => prenom.trim().toLowerCase()
+    );
+
+    // dans un Set il n'y a pas les doublons donc si la taille n'est pas la même que la liste
+    // cela veut dire qu'on avait un doublon qui est devenu une seule valeur dans le Set
+    if (new Set(prenomsNormalises).size !== prenomsNormalises.length) {
+        return res.status(400).json({
+            message: "Deux membres d'une même soirée ne peuvent pas avoir le même prénom."
+        });
+    }
+
+    // Création de la soirée et des membres dans une transaction
+    let transaction;
+
+    try {
+        // Début transaction
+        transaction = await db.transaction("write");
+
+        // Création de la soirée
+        const soireeResult = await transaction.execute({
+            sql: `
+                INSERT INTO soiree (nom, date)
+                VALUES (?, ?)
+            `,
+            args: [nom.trim(), date]
+        });
+
+        // id de la soiree créée
+        const soireeId = Number(soireeResult.lastInsertRowid);
+
+        const membresSoiree = [];
+
+        // Création ou récupération des personnes
+        for (const nom of membres as string[]) {
+            const nomPersonne = nom.trim();
+
+            // Vérifier si la personne existe déjà
+            const personneExistante = await transaction.execute({
+                sql: `
+                    SELECT id
+                    FROM personne
+                    WHERE nom = ?
+                `,
+                args: [nomPersonne]
+            });
+
+            let personneId: number;
+
+            // Si personne trouvée on recup son id
+            if (personneExistante.rows.length > 0) {
+                personneId = Number(personneExistante.rows[0].id);
+            } 
+            // Sinon on crée la personne et on récupère l'id créé
+            else {
+                // Créer la personne
+                const personneResult = await transaction.execute({
+                    sql: `
+                        INSERT INTO personne (nom)
+                        VALUES (?)
+                    `,
+                    args: [nomPersonne]
+                });
+
+                // Récupérer l'id créé
+                personneId = Number(personneResult.lastInsertRowid);
+            }
+
+            // Créer le lien entre la personne et la soirée
+            await transaction.execute({
+                sql: `
+                    INSERT INTO membre_soiree (personne_id, soiree_id)
+                    VALUES (?, ?)
+                `,
+                args: [personneId, soireeId]
+            });
+
+            membresSoiree.push({
+                id: personneId,
+                nom: nomPersonne
+            });
+        }
+
+        // Valider la transaction
+        await transaction.commit();
+
+        // Réponse
+        return res.status(201).json({
+            id: soireeId,
+            nom: nom.trim(),
+            date,
+            membres: membresSoiree
+        });
+
+    } 
+    catch (error) {
+        if (transaction) {
+            await transaction.rollback();
+        }
+
+        // Afficher erreur dans console serveur
+        console.error(error);
+
+        return res.status(500).json({
+            message: "Erreur lors de la création de la soirée."
+        });
+    }
+});
+
 
 export default app;
 if (!process.env.VERCEL){
