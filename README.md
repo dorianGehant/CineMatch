@@ -1,5 +1,12 @@
 # Cinématch
 
+# Adresse vercel :
+
+https://cine-match-dorian-0d9c.vercel.app/
+
+
+# Lancer le projet en local :
+
 Après avoir cloné le repository, effectuer les commandes suivantes à la racine du projet:
 
 1. `npm ci`
