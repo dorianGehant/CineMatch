@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback, type SyntheticEvent } from "react";
+import { useState, useEffect, type SyntheticEvent } from "react";
 import type { Soiree } from "../data/soiree";
 import "../css/creationEtListeSoiree.css";
 
