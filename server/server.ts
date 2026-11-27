@@ -1,5 +1,6 @@
 import express from 'express';
 import type { Request, Response } from 'express';
+import type { Soiree } from '../src/data/soiree.ts'
 import db from './base.ts';
 
 
@@ -57,7 +58,7 @@ app.use(express.json());
 app.get("/api/rechercheFilm", async (req: Request, res: Response) => {
 
     // Recupération des paramètres de l'url
-    const titre = req.query.titre;
+    const titre = req.query.titre; 
     const annee = req.query.annee;
 
     if (typeof titre !== "string" || titre.trim().length === 0) {
@@ -165,11 +166,67 @@ app.get("/api/rechercheFilm", async (req: Request, res: Response) => {
     }
 });
 
+// GET /api/soirees
+// Récupérer toutes les soirées avec leurs membres
+app.get("/api/soirees", async (_req: Request, res: Response) => {
+    try {
+        const result = await db.execute(`
+            SELECT
+                s.id AS soiree_id,
+                s.nom AS soiree_nom,
+                s.date AS soiree_date,
+                p.id AS personne_id,
+                p.nom AS personne_nom
+            FROM soiree s
+            JOIN membre_soiree ms ON s.id = ms.soiree_id
+            JOIN personne p ON ms.personne_id = p.id
+            ORDER BY s.date ASC
+        `);
+
+        const soirees: Soiree[] = [];
+
+        for (const row of result.rows) {
+            const soireeId = Number(row.soiree_id);
+
+            // On cherche si la soirée existe déjà dans le tableau
+            let soiree = soirees.find(s => s.id === soireeId);
+
+            // Si elle n'existe pas, on la crée
+            if (!soiree) {
+                soiree = {
+                    id: soireeId,
+                    nom: String(row.soiree_nom),
+                    date: String(row.soiree_date),
+                    membres: []
+                };
+
+                soirees.push(soiree);
+            }
+
+            // On ajoute le membre
+            if (row.personne_id !== null) {
+                soiree.membres.push({
+                    id: Number(row.personne_id),
+                    nom: String(row.personne_nom)
+                });
+            }
+        }
+
+        // Renvoie la liste des soirées sous forme de JSON
+        return res.status(200).json(soirees);
+
+    } 
+    catch (error) {
+        console.error(error);
+        return res.status(500).json({
+            message: "Erreur lors de la récupération des soirées."
+        });
+    }
+});
 
 // POST /api/soirees
 // Créer une soirée (et ses membres si ils n'existent pas déjà)
-
-app.post("/api/soirees", async (req: Request, res: Response) => {
+app.post("/api/create_soiree", async (req: Request, res: Response) => {
     const { nom, date, membres } = req.body;
 
     // Vérification du nom

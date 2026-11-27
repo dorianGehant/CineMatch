@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import type { SyntheticEvent } from "react";
-import type { Movie } from '../donnees/films';
+import type { Movie } from '../data/films';
 import { FilmCard } from '../components/FilmCard';
 import '../css/rechercheFilm.css';
 

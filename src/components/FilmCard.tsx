@@ -1,4 +1,4 @@
-import type {  Movie } from '../donnees/films';
+import type {  Movie } from '../data/films';
 
 export function FilmCard({ film }: {film: Movie }) {
   return (

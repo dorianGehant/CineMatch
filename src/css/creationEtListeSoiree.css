@@ -1,0 +1,203 @@
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: #f4f5f9;
+    color: #24243a;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 8px;
+}
+
+.header p {
+    color: #777;
+}
+
+.form-section,
+.soirees-section {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.05);
+}
+
+h2 {
+    margin-top: 0;
+    margin-bottom: 25px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    font-size: 1rem;
+}
+
+input:focus {
+    outline: none;
+    border-color: #6464db;
+}
+
+.member-input {
+    display: flex;
+    gap: 10px;
+}
+
+.member-input input {
+    flex: 1;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: 7px;
+    padding: 11px 16px;
+    font-size: 0.95rem;
+}
+
+.add-button {
+    background: #eeeeff;
+    color: #5555bd;
+    align-self: flex-start;
+}
+
+.remove-button {
+    background: #ffeaea;
+    color: #d33;
+}
+
+.submit-button {
+    width: 100%;
+    background: #5555bd;
+    color: white;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.submit-button:hover {
+    background: #41419e;
+}
+
+.add-button:hover {
+    background: #ddddff;
+}
+
+.error-message {
+    color: #d33;
+    background: #fff0f0;
+    padding: 12px;
+    border-radius: 7px;
+}
+
+.success-message {
+    color: #258044;
+    background: #eaf8ef;
+    padding: 12px;
+    border-radius: 7px;
+}
+
+.empty-message {
+    color: #888;
+    text-align: center;
+    padding: 20px;
+}
+
+.soirees-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.soiree-card {
+    border: 1px solid #e5e5ee;
+    border-radius: 9px;
+    padding: 18px;
+}
+
+.soiree-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.soiree-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.soiree-id {
+    color: #888;
+    font-size: 0.85rem;
+}
+
+.soiree-date {
+    color: #666;
+    margin: 12px 0;
+    text-transform: capitalize;
+}
+
+.members-list h4 {
+    margin-bottom: 8px;
+}
+
+.members-list ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.members-list li {
+    background: #eeeeff;
+    color: #5555bd;
+    padding: 7px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 20px 12px;
+    }
+
+    .form-section,
+    .soirees-section {
+        padding: 18px;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+    }
+}

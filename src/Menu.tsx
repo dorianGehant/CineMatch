@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import { RechercheFilm } from './pages/rechercheFilm';
+import PageCreationEtListeSoiree from './pages/creationEtListeSoiree';
 
 const pages = [
-  { id: 'rechercheFilm', label: 'Recherche', Page: RechercheFilm }
+  { id: 'rechercheFilm', label: 'Recherche film', Page: RechercheFilm },
+  { id: 'soirees', label: 'Soirees', Page: PageCreationEtListeSoiree },
 ];
 
 export function Menu() {
