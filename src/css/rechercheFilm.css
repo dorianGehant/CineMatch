@@ -201,3 +201,55 @@
         flex-basis: 100%;
     }
 }
+
+/* Boutons de proposition */
+
+.proposition-button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 11px 12px;
+    border: none;
+    border-radius: 7px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.proposition-button.add {
+    background-color: #5555bd;
+    color: white;
+}
+
+.proposition-button.add:hover {
+    background-color: #41419e;
+}
+
+.proposition-button.remove {
+    background-color: #ffeaea;
+    color: #d33;
+}
+
+.proposition-button.remove:hover {
+    background-color: #ffd6d6;
+}
+
+.proposition-button.disabled {
+    background-color: #e5e5e5;
+    color: #888;
+    cursor: not-allowed;
+}
+
+.results-grid > div {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.results-grid .result-card {
+    flex: 1;
+}
+
+.proposition-button {
+    margin-top: 10px;
+}

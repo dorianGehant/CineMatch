@@ -2,10 +2,11 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { Menu } from './Menu';
 import './css/style.css';
-import { TMDBCreditsFooter } from './components/TMBDCreditsFooter';
+import { BrowserRouter } from 'react-router-dom';
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <Menu />
-    <TMDBCreditsFooter />
+    <BrowserRouter>
+      <Menu />
+    </BrowserRouter>
   </React.StrictMode>,
 );

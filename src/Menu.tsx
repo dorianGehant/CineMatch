@@ -1,34 +1,31 @@
-import { useEffect, useState } from 'react';
-import { RechercheFilm } from './pages/rechercheFilm';
-import PageCreationEtListeSoiree from './pages/creationEtListeSoiree';
+import { Routes, Route, NavLink, Navigate } from 'react-router-dom';
 
-const pages = [
-  { id: 'rechercheFilm', label: 'Recherche film', Page: RechercheFilm },
-  { id: 'soirees', label: 'Soirees', Page: PageCreationEtListeSoiree },
-];
+import { PageRechercheFilm } from './pages/pageRechercheFilm';
+import PageCreationEtListeSoiree from './pages/pageCreationEtListeSoiree';
+import { PageSoiree } from './pages/pageSoiree';
+import { TMDBCreditsFooter } from './components/TMBDCreditsFooter';
 
 export function Menu() {
-  const [hash, setHash] = useState(window.location.hash.slice(1));
+    return (
+        <>
+            <nav className="menu">
+                <NavLink to="/rechercheFilm">Recherche film</NavLink>
+                <NavLink to="/soirees">Soirées</NavLink>
+            </nav>
 
-  useEffect(() => {
-    const onChange = () => setHash(window.location.hash.slice(1));
-    window.addEventListener('hashchange', onChange);
-    return () => window.removeEventListener('hashchange', onChange);
-  }, []);
+            <main>
+                <Routes>
+                    <Route path="/" element={<Navigate to="/rechercheFilm" replace />} />
+                    
+                    <Route path="/rechercheFilm" element={<PageRechercheFilm />} />
 
-  const current = pages.find((p) => p.id === hash) ?? pages[0];
+                    <Route path="/soirees" element={<PageCreationEtListeSoiree />} />
 
+                    <Route path="/soiree/:id" element={<PageSoiree />} />
+                </Routes>
+            </main>
 
-  return (
-    <>
-      <nav className="menu">
-        {pages.map((p) => (
-          <a key={p.id} href={`#${p.id}`} aria-current={p === current ? 'page' : undefined}>
-            {p.label}
-          </a>
-        ))}
-      </nav>
-      <current.Page />
-    </>
-  );
+            <TMDBCreditsFooter />
+        </>
+    );
 }

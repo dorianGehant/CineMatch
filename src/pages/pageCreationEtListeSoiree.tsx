@@ -1,5 +1,7 @@
 
 import { useState, useEffect, type SyntheticEvent } from "react";
+import { useNavigate } from "react-router-dom";
+
 import type { Soiree } from "../data/soiree";
 import "../css/creationEtListeSoiree.css";
 
@@ -14,7 +16,7 @@ function getCurrentDate(): string {
     return `${year}-${month}-${day}`;
 }
 
-// Formate une date pour l'affichage
+// Retourne la date sous la forme "lundi 1 janvier 2026"
 function formatDate(date: string): string {
     return new Date(`${date}T00:00:00`).toLocaleDateString("fr-FR", {
         weekday: "long",
@@ -24,7 +26,9 @@ function formatDate(date: string): string {
     });
 }
 
-function PageCreationEtListeSoiree() {
+export function PageCreationEtListeSoiree() {
+    const navigate = useNavigate();
+
     // Liste des soirées
     const [soirees, setSoirees] = useState<Soiree[]>([]);
     const [loading, setLoading] = useState(true);
@@ -250,6 +254,14 @@ function PageCreationEtListeSoiree() {
                                 <p className="liste-membres">
                                     {soiree.membres.map(membre => membre.nom).join(", ")}
                                 </p>
+
+                                <button
+                                    type="button"
+                                    className="view-button"
+                                    onClick={() => navigate(`/soiree/${soiree.id}`)}
+                                >
+                                    Voir la soirée
+                                </button>
 
                             </article>
                         ))}

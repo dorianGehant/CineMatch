@@ -166,6 +166,23 @@ button {
     text-transform: capitalize;
 }
 
+.liste-membres {
+    color: #666;
+    margin: 12px 0;
+}
+
+.view-button {
+    background: #5555bd;
+    color: white;
+    font-weight: bold;
+    margin-top: 5px;
+    transition: background 0.2s ease;
+}
+
+.view-button:hover {
+    background: #41419e;
+}
+
 .members-list h4 {
     margin-bottom: 8px;
 }

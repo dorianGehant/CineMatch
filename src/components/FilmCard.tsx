@@ -1,6 +1,6 @@
-import type {  Movie } from '../data/films';
+import type {  Film } from '../data/films';
 
-export function FilmCard({ film }: {film: Movie }) {
+export function FilmCard({ film }: {film: Film }) {
   return (
     <article className="result-card">
       {film.poster ? (
